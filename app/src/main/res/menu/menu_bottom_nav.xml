@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/doggoList"
+        android:title="home"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/favorites"
+        android:title="discover"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/favorite3s"
+        android:title="search"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/favorites4"
+        android:title="favorites"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/favorite234s"
+        android:title="custom"
+        app:showAsAction="ifRoom"
+        />
+</menu>
