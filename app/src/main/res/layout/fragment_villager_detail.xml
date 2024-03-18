@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_villager_detail"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/image_villager_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        tools:src="@drawable/placeholder"
+        android:contentDescription="Villager Icon"
+        tools:ignore="ContentDescription"/>
+
+    <TextView
+        android:id="@+id/text_villager_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Villager Name"/>
+
+    <TextView
+        android:id="@+id/text_villager_gender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Gender"/>
+
+    <TextView
+        android:id="@+id/text_villager_personality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Personality"/>
+
+    <TextView
+        android:id="@+id/text_villager_species"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Species"/>
+
+    <TextView
+        android:id="@+id/text_villager_birthday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Birthday"/>
+
+    <TextView
+        android:id="@+id/text_villager_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Villager ID"/>
+
+    <TextView
+        android:id="@+id/text_quote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Quote"/>
+
+    <TextView
+        android:id="@+id/text_catchphrase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Catchphrase"/>
+
+    <TextView
+        android:id="@+id/text_fav_styles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Favorite Styles"/>
+
+    <TextView
+        android:id="@+id/text_fav_colors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Favorite Colors"/>
+
+    <TextView
+        android:id="@+id/text_hobby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        tools:text="Hobby"/>
+
+    <ImageView
+        android:id="@+id/text_house_exterior_url"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        tools:src="@drawable/placeholder"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="8dp"
+        />
+
+</LinearLayout>

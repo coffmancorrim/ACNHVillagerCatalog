@@ -2,27 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/doggoList"
+        android:id="@+id/item_home"
         android:title="home"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/favorites"
+        android:id="@+id/item_discover"
         android:title="discover"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/favorite3s"
-        android:title="search"
-        app:showAsAction="ifRoom"
-        />
-    <item
-        android:id="@+id/favorites4"
+        android:id="@+id/item_favorites"
         android:title="favorites"
         app:showAsAction="ifRoom"
         />
     <item
-        android:id="@+id/favorite234s"
+        android:id="@+id/item_custom"
         android:title="custom"
         app:showAsAction="ifRoom"
         />

@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_favorites"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FavoriteFragment">
-
+    tools:context=".FavoriteFragment"
+    android:clickable="false"
+    >
 
     <TextView
+        android:id="@+id/text_favorites"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:text="FAVORITES FRAGMENT" />
 
-</FrameLayout>
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_inner_container_view"
+        app:layout_constraintTop_toBottomOf="@id/text_favorites"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="me.proton.coffmancorrim.acnhvillagercatalog.VillagersListFragment"
+        tools:layout="@layout/fragment_villagers_list" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

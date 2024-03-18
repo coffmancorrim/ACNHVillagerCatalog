@@ -1,28 +1,56 @@
 package me.proton.coffmancorrim.acnhvillagercatalog.ui
 
+import android.content.Context
 import android.graphics.Color
+import android.provider.ContactsContract.CommonDataKinds.Im
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.view.isVisible
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.VillagerDetailFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Birthday
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Gender
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Hobby
+import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
 import me.proton.coffmancorrim.acnhvillagercatalog.model.NhDetails
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Personality
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Species
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
+import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 import kotlin.random.Random
 
-class VillagerAdapter(val villagerList: List<Villager> = generateVillagerList(5)) : RecyclerView.Adapter<VillagerAdapter.VillagerViewHolder>() {
+class VillagerAdapter(
+    private val villagerList: List<Villager>,
+    private val fragmentManager: FragmentManager,
+    private val mainViewModel: MainViewModel,
+    private val parentId: Int,
+    private val bottomNavigationView: BottomNavigationView
+    )
+    : RecyclerView.Adapter<VillagerAdapter.VillagerViewHolder>() {
+
+    private var filteredList: List<Villager> = villagerList
 
     inner class VillagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageVillagerIcon = itemView.findViewById<ImageView>(R.id.image_villager_icon)
         val textVillagerName = itemView.findViewById<TextView>(R.id.text_villager_name)
         val textVillagerCatchPhrase = itemView.findViewById<TextView>(R.id.text_villager_catchphrase)
+        val optionsIcon = itemView.findViewById<ImageView>(R.id.icon_options)
+        val favoritesIcon = itemView.findViewById<ImageView>(R.id.icon_favorite)
+        val favoritesIconFilled = itemView.findViewById<ImageView>(R.id.icon_favorite_filled)
+
+        val disableView = itemView.findViewById<View>(R.id.viewDisableLayout)
 
     }
 
@@ -32,64 +60,145 @@ class VillagerAdapter(val villagerList: List<Villager> = generateVillagerList(5)
     }
 
     override fun onBindViewHolder(villagerViewHolder: VillagerViewHolder, position: Int) {
-        val villager = villagerList[position]
+        val villager = filteredList[position]
         villagerViewHolder.itemView.setBackgroundColor(Color.parseColor(villager.titleColor))
-        villagerViewHolder.imageVillagerIcon.setImageResource(R.drawable.place_holder_villager_icon)
+        Glide
+            .with(villagerViewHolder.itemView.context)
+            .load("ignorethis")
+            .placeholder(R.drawable.placeholder)
+            .into(villagerViewHolder.imageVillagerIcon)
+
         villagerViewHolder.textVillagerName.text = villager.name
         villagerViewHolder.textVillagerCatchPhrase.text = villager.nhDetails.catchphrase
+
+        if (mainViewModel.isVillagerInList(villager, mainViewModel.favoritesList.value)){
+            villagerViewHolder.favoritesIcon.visibility = View.GONE
+            villagerViewHolder.favoritesIconFilled.visibility = View.VISIBLE
+        }
+
+        villagerViewHolder.optionsIcon.setOnClickListener {
+            showPopupMenu(villagerViewHolder.optionsIcon, position, villagerViewHolder.optionsIcon.context)
+        }
+
+        villagerViewHolder.favoritesIcon.setOnClickListener {
+            if (villagerViewHolder.favoritesIcon.visibility == View.VISIBLE){
+                villagerViewHolder.favoritesIcon.visibility = View.GONE
+                villagerViewHolder.favoritesIconFilled.visibility = View.VISIBLE
+
+                mainViewModel.addFavoriteVillager(villager)
+            }
+        }
+
+        villagerViewHolder.favoritesIconFilled.setOnClickListener {
+            if (villagerViewHolder.favoritesIconFilled.visibility == View.VISIBLE){
+                villagerViewHolder.favoritesIconFilled.visibility = View.GONE
+                villagerViewHolder.favoritesIcon.visibility = View.VISIBLE
+
+                mainViewModel.removeFavoriteVillager(villager)
+
+                if (mainViewModel.isFavoritesList.value){
+                    notifyDataSetChanged()
+                }
+            }
+        }
+
+        Log.d("IS_CLICKABLE", mainViewModel.isListClickable.value.toString())
+        if(!mainViewModel.isListClickable.value){
+            villagerViewHolder.disableView.visibility = View.VISIBLE
+            villagerViewHolder.disableView.setOnClickListener {
+                Log.d("IS_CLICKABLE", "mainViewModel.isListClickable.value.toString()")
+                bottomNavigationView.selectedItemId = parentId
+            }
+        }else{
+            villagerViewHolder.disableView.visibility = View.GONE
+            villagerViewHolder.disableView.setOnClickListener {
+
+            }
+        }
+
+        villagerViewHolder.itemView.setOnClickListener {
+            mainViewModel.detailVillager = filteredList[position]
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragment_container_view, VillagerDetailFragment())
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
     }
 
     override fun getItemCount(): Int {
-        return villagerList.size
+        return filteredList.size
     }
 
+    private fun showPopupMenu(imageView: ImageView, position: Int, context: Context) {
+        val popupMenu = PopupMenu(context, imageView)
+        popupMenu.inflate(R.menu.menu_villager_options)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_add_to_list -> {
 
-    companion object{
+                    showOptionsDialog(mainViewModel.listOfNames.value, position, item.itemId, context)
+                    true
+                }
+                R.id.action_delete_from_list -> {
 
-        fun generateVillagerList(numberOfVillagers: Int) : List<Villager>{
-            val dummyList = mutableListOf<Villager>()
-            for (i in 0 until  numberOfVillagers){
-                dummyList.add(generateDummyVillager())
+                    showOptionsDialog(mainViewModel.listOfNames.value, position, item.itemId, context)
+                    true
+                }
+                else -> false
             }
-            return dummyList
         }
-
-        fun generateDummyVillager(): Villager {
-            val names = listOf("Bob", "Alice", "Tom", "Sally", "Charlie")
-            val personalities = listOf("Big sister", "Cranky", "Jock", "Lazy", "Normal", "Peppy", "Smug", "Snooty")
-            val months = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-            val days = (1..31).map { it.toString() }
-            val signs = listOf("Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces")
-            val colors = listOf("Red", "Blue", "Green", "Yellow", "Purple", "Orange", "Pink", "Brown", "Black", "White")
-
-            val random = Random.Default
-
-            return Villager(
-                name = names.random(),
-                gender = Gender.values().random(),
-                personality = Personality.values().random(),
-                species = Species.values().random(),
-                birthday = Birthday(months.random(), days.random()),
-                titleColor = generateRandomColor(),
-                textColor = generateRandomColor(),
-                id = "cat${random.nextInt(100)}",
-                nhDetails = NhDetails(
-                    iconUrl = "https://example.com/icon/${random.nextInt(100)}",
-                    quote = "Random quote ${random.nextInt(100)}",
-                    catchphrase = "Random catchphrase ${random.nextInt(100)}",
-                    favStyles = listOf("Style1", "Style2"),
-                    favColors = colors.shuffled().take(2),
-                    hobby = Hobby.values().random(),
-                    houseExteriorUrl = "https://example.com/house/${random.nextInt(100)}"
-                )
-            )
-        }
-
-        private fun generateRandomColor(): String {
-            val random = Random.Default
-            val color = random.nextInt(0xFFFFFF + 1)
-            return String.format("#%06X", color)
-        }
-
+        popupMenu.show()
     }
+
+    fun showOptionsDialog(list: List<ListWrapper>, position: Int, itemId: Int, context: Context) {
+        val options = list.map { it.listName }.toTypedArray()
+
+        val builder = MaterialAlertDialogBuilder(context)
+        builder.setTitle("Select a list")
+
+        builder.setItems(options) { _, optionIndex ->
+            val selectedList = list[optionIndex]
+            if(itemId == R.id.action_add_to_list){
+                mainViewModel.addVillagerToCustomList(selectedList.keyId, filteredList[position])
+            } else if (itemId == R.id.action_delete_from_list){
+                mainViewModel.removeVillagerFromCustomList(selectedList.keyId, filteredList[position])
+            }
+
+
+        }
+
+        builder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        builder.show()
+    }
+
+    fun filter(query: String) {
+        Log.d("Filter", "Filtering with query: $query")
+
+        filteredList = if (query.isEmpty()) {
+            Log.d("Filter", "Query is empty, resetting to original list")
+            villagerList.toList()
+        } else {
+            val filtered = villagerList.filter { item ->
+                val nameContains = item.name.contains(query, ignoreCase = true)
+                val speciesContains = item.species.name.contains(query, ignoreCase = true)
+                val personalityContains = item.personality.name.contains(query, ignoreCase = true)
+                val birthMonthContains = item.birthday.month.contains(query, ignoreCase = true)
+                val contains = nameContains || speciesContains || personalityContains || birthMonthContains
+
+                Log.d("Filter", "Item: ${item.name}, Query: $query, Name Contains: $nameContains, Species Contains: $speciesContains, Personality Contains: $personalityContains, BirthMonth Contains: $birthMonthContains, Contains: $contains")
+                contains
+            }
+            Log.d("Filter", "Filtered list size: ${filtered.size}")
+            filtered
+        }
+
+        notifyDataSetChanged()
+    }
+
+
+
+
 }
