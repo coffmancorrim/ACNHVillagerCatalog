@@ -1,4 +1,4 @@
-package me.proton.coffmancorrim.acnhvillagercatalog
+package me.proton.coffmancorrim.acnhvillagercatalog.ui.common
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import me.proton.coffmancorrim.acnhvillagercatalog.R
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 
@@ -69,7 +70,7 @@ class VillagerDetailFragment : Fragment() {
             villagerGenderTextView.text = villager.gender.name
             villagerPersonalityTextView.text = villager.personality.name
             villagerSpeciesTextView.text = villager.species.name
-            villagerBirthdayTextView.text = "${villager.birthday.month} ${villager.birthday.day}"
+            villagerBirthdayTextView.text = "${villager.birthdayMonth} ${villager.birthdayDay}"
             textVillagerId.text = villager.id
 
             textQuote.text = villager.nhDetails.quote

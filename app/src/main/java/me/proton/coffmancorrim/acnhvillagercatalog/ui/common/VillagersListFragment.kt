@@ -1,27 +1,24 @@
-package me.proton.coffmancorrim.acnhvillagercatalog
+package me.proton.coffmancorrim.acnhvillagercatalog.ui.common
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.R
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
-import me.proton.coffmancorrim.acnhvillagercatalog.ui.ListOfNamesAdapter
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.VillagerAdapter
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
@@ -45,6 +42,8 @@ class VillagersListFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        mainViewModel.fillVillagerData()
+
         val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
         val searchView = view.findViewById<SearchView>(R.id.search_villagers)
 
@@ -62,23 +61,7 @@ class VillagersListFragment : Fragment(){
 
         when (parentView.id){
             R.id.layout_discover -> {
-                villagerRecyclerView.layoutManager = LinearLayoutManager(view.context)
-                viewLifecycleOwner.lifecycleScope.launch {
-                    lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                        mainViewModel.villagerListFiltered.collect{list ->
-                            mainViewModel.updateFilteredList()
-                            val villagerAdapter = VillagerAdapter(
-                                mainViewModel.copyRandomElements(list, 10),
-                                fragmentManager,
-                                mainViewModel,
-                                R.id.item_discover,
-                                bottomNavigationView
-                            )
-                            villagerRecyclerView.adapter = villagerAdapter
-                            setupSearchView(searchView, villagerAdapter)
-                        }
-                    }
-                }
+                setupObservers(fragmentManager, bottomNavigationView, searchView)
             }
 
             R.id.layout_favorites -> {
@@ -145,6 +128,46 @@ class VillagersListFragment : Fragment(){
             }
         )
     }
+
+    private fun setupObservers(fragmentManager: FragmentManager, bottomNavigationView: BottomNavigationView, searchView: SearchView) {
+        lifecycleScope.launch {
+            villagerRecyclerView.layoutManager = LinearLayoutManager(view?.context)
+            val textError = view?.findViewById<TextView>(R.id.error_message)
+            val progressBar = view?.findViewById<ProgressBar>(R.id.progress_bar)
+            mainViewModel.villagerList.collect { event ->
+                when (event) {
+                    MainViewModel.VillagerEvent.Error -> {
+                        textError?.visibility = View.VISIBLE
+                        progressBar?.visibility = View.GONE
+                        villagerRecyclerView.visibility = View.GONE
+
+                    }
+                    MainViewModel.VillagerEvent.Loading -> {
+                        textError?.visibility = View.GONE
+                        progressBar?.visibility = View.VISIBLE
+                        villagerRecyclerView.visibility = View.GONE
+
+                    }
+                    is MainViewModel.VillagerEvent.Success -> {
+                        textError?.visibility = View.GONE
+                        progressBar?.visibility = View.GONE
+                        villagerRecyclerView.visibility = View.VISIBLE
+
+                        val villagerAdapter = VillagerAdapter(
+                            mainViewModel.filterListForFavorites(event.villagersList, mainViewModel.favoritesList.value),
+                            fragmentManager,
+                            mainViewModel,
+                            R.id.item_discover,
+                            bottomNavigationView
+                        )
+                        villagerRecyclerView.adapter = villagerAdapter
+                        setupSearchView(searchView, villagerAdapter)
+                    }
+                }
+            }
+        }
+    }
+
 
 
 }

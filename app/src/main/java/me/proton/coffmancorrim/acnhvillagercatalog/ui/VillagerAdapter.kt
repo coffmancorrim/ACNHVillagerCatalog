@@ -2,7 +2,6 @@ package me.proton.coffmancorrim.acnhvillagercatalog.ui
 
 import android.content.Context
 import android.graphics.Color
-import android.provider.ContactsContract.CommonDataKinds.Im
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,26 +9,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.coffmancorrim.acnhvillagercatalog.R
-import me.proton.coffmancorrim.acnhvillagercatalog.VillagerDetailFragment
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Birthday
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Gender
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Hobby
+import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagerDetailFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
-import me.proton.coffmancorrim.acnhvillagercatalog.model.NhDetails
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Personality
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Species
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
-import kotlin.random.Random
 
 class VillagerAdapter(
     private val villagerList: List<Villager>,
@@ -61,7 +50,10 @@ class VillagerAdapter(
 
     override fun onBindViewHolder(villagerViewHolder: VillagerViewHolder, position: Int) {
         val villager = filteredList[position]
-        villagerViewHolder.itemView.setBackgroundColor(Color.parseColor(villager.titleColor))
+
+        val colorString = "#${villager.titleColor}"
+        villagerViewHolder.itemView.setBackgroundColor(Color.parseColor(colorString))
+
         Glide
             .with(villagerViewHolder.itemView.context)
             .load("ignorethis")
@@ -85,6 +77,7 @@ class VillagerAdapter(
                 villagerViewHolder.favoritesIcon.visibility = View.GONE
                 villagerViewHolder.favoritesIconFilled.visibility = View.VISIBLE
 
+                villager.favorite = true
                 mainViewModel.addFavoriteVillager(villager)
             }
         }
@@ -94,6 +87,7 @@ class VillagerAdapter(
                 villagerViewHolder.favoritesIconFilled.visibility = View.GONE
                 villagerViewHolder.favoritesIcon.visibility = View.VISIBLE
 
+                villager.favorite = false
                 mainViewModel.removeFavoriteVillager(villager)
 
                 if (mainViewModel.isFavoritesList.value){
@@ -108,6 +102,11 @@ class VillagerAdapter(
             villagerViewHolder.disableView.setOnClickListener {
                 Log.d("IS_CLICKABLE", "mainViewModel.isListClickable.value.toString()")
                 bottomNavigationView.selectedItemId = parentId
+
+                Log.d("RELOAD", "ON CLICK VILLAGER VIEW HOLDER")
+                if (mainViewModel.reloadVillagerData && parentId == R.id.item_discover){
+                    mainViewModel.toggleReloadVillagerData()
+                }
             }
         }else{
             villagerViewHolder.disableView.visibility = View.GONE
@@ -185,7 +184,7 @@ class VillagerAdapter(
                 val nameContains = item.name.contains(query, ignoreCase = true)
                 val speciesContains = item.species.name.contains(query, ignoreCase = true)
                 val personalityContains = item.personality.name.contains(query, ignoreCase = true)
-                val birthMonthContains = item.birthday.month.contains(query, ignoreCase = true)
+                val birthMonthContains = item.birthdayMonth.contains(query, ignoreCase = true)
                 val contains = nameContains || speciesContains || personalityContains || birthMonthContains
 
                 Log.d("Filter", "Item: ${item.name}, Query: $query, Name Contains: $nameContains, Species Contains: $speciesContains, Personality Contains: $personalityContains, BirthMonth Contains: $birthMonthContains, Contains: $contains")

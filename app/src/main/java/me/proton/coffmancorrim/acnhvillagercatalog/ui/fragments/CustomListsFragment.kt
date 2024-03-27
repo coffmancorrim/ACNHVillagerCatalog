@@ -1,14 +1,12 @@
-package me.proton.coffmancorrim.acnhvillagercatalog
+package me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -17,8 +15,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.R
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.ListOfNamesAdapter
-import me.proton.coffmancorrim.acnhvillagercatalog.ui.VillagerAdapter
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class CustomListsFragment : Fragment() {

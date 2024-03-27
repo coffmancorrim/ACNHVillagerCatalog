@@ -1,13 +1,11 @@
-package me.proton.coffmancorrim.acnhvillagercatalog
+package me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments
 
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentContainer
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
@@ -16,11 +14,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
-import me.proton.coffmancorrim.acnhvillagercatalog.ui.VillagerAdapter
+import me.proton.coffmancorrim.acnhvillagercatalog.R
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 
 class HomeFragment : Fragment() {
+
     private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -33,28 +32,26 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         if (mainViewModel.isListClickable.value){
             mainViewModel.toggleIsListClickableBoolean()
         }
-
 
         val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
 
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.villagerListFiltered.collect{list ->
-                    if (list.isNotEmpty()){
-                        val fragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_discover_container)
-                        fragmentContainerView.visibility = View.VISIBLE
-                        fragmentContainerView.setOnClickListener {
-                            Log.d("HOME_FRAGMENT", "ON_CLICK")
-                          bottomNavigationView.selectedItemId = R.id.item_discover
-                        }
+                val fragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_discover_container)
+                fragmentContainerView.visibility = View.VISIBLE
+                fragmentContainerView.setOnClickListener {
+                    Log.d("HOME_FRAGMENT", "ON_CLICK")
+                    bottomNavigationView.selectedItemId = R.id.item_discover
 
-                        replaceFragment(DiscoverFragment(), fragmentContainerView.id)
+                    if (mainViewModel.reloadVillagerData){
+                        mainViewModel.toggleReloadVillagerData()
                     }
                 }
+
+                replaceFragment(DiscoverFragment(), fragmentContainerView.id)
             }
         }
 

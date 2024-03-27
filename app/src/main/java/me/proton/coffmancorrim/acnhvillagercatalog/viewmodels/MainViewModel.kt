@@ -2,21 +2,166 @@ package me.proton.coffmancorrim.acnhvillagercatalog.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Birthday
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Gender
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Hobby
+import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.data.AnimalCrossingRepositoryImpl
+import me.proton.coffmancorrim.acnhvillagercatalog.data.VillagerDatabaseSingleton
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
-import me.proton.coffmancorrim.acnhvillagercatalog.model.NhDetails
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Personality
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Species
+import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapperDatabase
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
-import kotlin.random.Random
+import me.proton.coffmancorrim.acnhvillagercatalog.model.VillagerResponse
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val animalCrossingRepository: AnimalCrossingRepositoryImpl = AnimalCrossingRepositoryImpl(
+        VillagerDatabaseSingleton.getDatabase().villagerDao(),
+        ListWrapperDatabase.getDatabase().listWrapperDao()
+    )
+) : ViewModel() {
     var customKey: String? = null
     var detailVillager: Villager? = null
+    var reloadVillagerData: Boolean = true
+    var update = 0
+
+    private val _mutableVillagerList: MutableStateFlow<VillagerEvent> =
+        MutableStateFlow(VillagerEvent.Loading)
+    val villagerList: StateFlow<VillagerEvent>
+        get() = _mutableVillagerList
+
+
+    fun fillVillagerData() {
+        viewModelScope.launch {
+            Log.d("RELOAD", reloadVillagerData.toString())
+            if (reloadVillagerData) {
+                if (_mutableVillagerList.value !is VillagerEvent.Loading) {
+                    _mutableVillagerList.value = VillagerEvent.Loading
+                }
+
+                var localResponse = animalCrossingRepository.getVillagersFromDao()
+                Log.d("Debug", "Local response: $localResponse")
+                if (localResponse is VillagerResponse.Success) {
+
+                    val localFavoritesResponse = animalCrossingRepository.getVillagersFromDao(true)
+                    Log.d("Debug", "Local favorites response: $localFavoritesResponse")
+                    if (update < 1) {
+
+                        val maybenull = animalCrossingRepository.getListWrapperDao()
+                        if (maybenull != null){
+                            _listOfNames.value = maybenull as MutableList<ListWrapper>
+
+                            localResponse = VillagerResponse.Success(
+                                updateVillagersInMapWithListWrappersAndClear(
+                                    localResponse.villagerList,
+                                    listOfNames.value,
+                                    _dictOfVillagerLists.value
+                                )
+                            )
+                        }
+
+                        if (localFavoritesResponse is VillagerResponse.Success) {
+                            _mutableFavoritesList.value =
+                                updateVillagersInMapWithListWrappersAndClear(
+                                    localFavoritesResponse.villagerList,
+                                    listOfNames.value,
+                                    _dictOfVillagerLists.value
+                                ) as MutableList<Villager>
+
+                        } else {
+                            Log.e("Debug", "Failed to get favorites list")
+                        }
+                        animalCrossingRepository.cleanseVillagerWrapperIds()
+                        update++
+                    }
+                    _mutableVillagerList.value = VillagerEvent.Success(localResponse.villagerList)
+                } else {
+                    when (val response = animalCrossingRepository.getVillagers()) {
+                        is VillagerResponse.Success -> _mutableVillagerList.value =
+                            VillagerEvent.Success(response.villagerList)
+
+                        VillagerResponse.Error -> _mutableVillagerList.value = VillagerEvent.Error
+                    }
+                }
+
+            } else {
+                reloadVillagerData = true
+            }
+        }
+    }
+
+    fun updateVillagersInMapWithListWrappersAndClear(
+        villagerList: List<Villager>,
+        listWrapperList: List<ListWrapper>,
+        villagerMap: MutableMap<String, MutableList<Villager>>
+    ): List<Villager> {
+        for (villager in villagerList) {
+            Log.d("UPDATE_MAP_LIST_WRAPPERS", "Processing villager: $villager")
+            villager.listWrapperIds?.let { listWrapperIds ->
+                for (listWrapper in listWrapperList) {
+                    Log.d("UPDATE_MAP_LIST_WRAPPERS", "Checking listWrapper: $listWrapper")
+                    if (listWrapper.keyId in listWrapperIds) {
+                        Log.d("UPDATE_MAP_LIST_WRAPPERS", "Adding villager to list with keyId: ${listWrapper.keyId}, name: ${listWrapper.listName}")
+                        val villagerListForKeyId = villagerMap.getOrPut(listWrapper.keyId) { mutableListOf() }
+                        villagerListForKeyId.add(villager)
+                        Log.d("UPDATE_MAP_LIST_WRAPPERS", "Villager added to list: $villagerListForKeyId")
+                    }
+                }
+                // Clear the listWrapperIds after adding the villager to the map
+                // we do this because we have a function to add all the key data at the end of the activity life cycle
+                villager.listWrapperIds = null
+                Log.d("UPDATE_MAP_LIST_WRAPPERS", "Cleared listWrapperIds for villager: $villager")
+            }
+        }
+
+        return villagerList
+    }
+
+
+    suspend fun updateDao() {
+        Log.d("UpdateDao", "Updating DAO")
+
+        if (_mutableVillagerList.value is VillagerEvent.Success) {
+            val villagers = (_mutableVillagerList.value as VillagerEvent.Success).villagersList
+            Log.d("UpdateDao", "Adding villagers to DAO: $villagers")
+            animalCrossingRepository.addVillagersToDao(villagers)
+        }
+
+        Log.d("UpdateDao", "Adding favorites to DAO: ${favoritesList.value}")
+        animalCrossingRepository.addVillagersToDao(favoritesList.value)
+
+        Log.d("UpdateDao", "Adding list wrappers to DAO: ${_listOfNames.value}")
+        animalCrossingRepository.addListWrappersToDao(_listOfNames.value)
+
+        Log.d("UpdateDao", "Processing villagers by list wrapper")
+        processVillagersByListWrapper(listOfNames.value, dictOfVillagerLists.value)
+    }
+
+
+    suspend fun processVillagersByListWrapper(listWrapperList: List<ListWrapper>, villagerMap: Map<String, List<Villager>>) {
+        for (listWrapper in listWrapperList) {
+            val keyId = listWrapper.keyId
+            val villagerList = villagerMap[keyId]
+            villagerList?.let { villagers ->
+                for (villager in villagers) {
+                    Log.d("processVillagersByListWrapper", "$villager.name, $keyId")
+                    animalCrossingRepository.addListWrapperIdToVillager(villager.name, keyId)
+                }
+            }
+        }
+    }
+
+
+    private val _listOfNames: MutableStateFlow<MutableList<ListWrapper>> =
+        MutableStateFlow(mutableListOf<ListWrapper>())
+    val listOfNames: StateFlow<List<ListWrapper>>
+        get() = _listOfNames
+
+    private val _dictOfVillagerLists: MutableStateFlow<MutableMap<String, MutableList<Villager>>> =
+        MutableStateFlow(mutableMapOf())
+    val dictOfVillagerLists: StateFlow<Map<String, List<Villager>>>
+        get() = _dictOfVillagerLists
+
 
     private val _isListClickable = MutableStateFlow<Boolean>(true)
     val isListClickable: StateFlow<Boolean>
@@ -28,59 +173,54 @@ class MainViewModel : ViewModel() {
     }
 
 
-    private val _mutableVillagerList = MutableStateFlow(fillVillagerData())
-    val villagerList: StateFlow<List<Villager>>
-        get() = _mutableVillagerList
+    fun toggleReloadVillagerData() {
+        reloadVillagerData = !(reloadVillagerData)
+        Log.d("RELOAD", "toggleReloadVillagerData(): " + reloadVillagerData.toString())
+    }
 
-    private val _mutableVillagerListFiltered = MutableStateFlow(villagerList.value.toMutableList())
-    val villagerListFiltered: StateFlow<List<Villager>>
-        get() = _mutableVillagerListFiltered
-
-    private val _listOfNames: MutableStateFlow<MutableList<ListWrapper>> = MutableStateFlow(mutableListOf<ListWrapper>())
-    val listOfNames: StateFlow<List<ListWrapper>>
-        get() = _listOfNames
-
-
-
-    private val _dictOfVillagerLists: MutableStateFlow<Map<String, List<Villager>>> = MutableStateFlow(emptyMap())
-    val dictOfVillagerLists: StateFlow<Map<String, List<Villager>>>
-        get() = _dictOfVillagerLists
-
-    fun addCustomListHelper(){
+    fun addCustomListHelper() {
         val listNameWrapper = ListWrapper("NewList")
         addCustomList(listNameWrapper)
     }
 
     private fun addCustomList(listNameWrapper: ListWrapper) {
         _listOfNames.value.add(listNameWrapper)
-        val newDictionary = _dictOfVillagerLists.value.toMutableMap().apply { put(listNameWrapper.keyId, emptyList()) }
+        val newDictionary = _dictOfVillagerLists.value.toMutableMap()
+            .apply { put(listNameWrapper.keyId, mutableListOf()) }
         _dictOfVillagerLists.value = newDictionary
     }
 
     fun removeCustomList(listNameWrapper: ListWrapper) {
         _listOfNames.value.remove(listNameWrapper)
-        val newDictionary = _dictOfVillagerLists.value.toMutableMap().apply { remove(listNameWrapper.keyId) }
+        val newDictionary =
+            _dictOfVillagerLists.value.toMutableMap().apply { remove(listNameWrapper.keyId) }
         _dictOfVillagerLists.value = newDictionary
     }
 
-    fun renameListWrapper(newName: String, index: Int){
+    fun renameListWrapper(newName: String, index: Int) {
         _listOfNames.value[index].listName = newName
     }
 
     fun addVillagerToCustomList(name: String, villager: Villager) {
         val list = _dictOfVillagerLists.value[name]?.toMutableList() ?: mutableListOf()
-        val newDictionary = _dictOfVillagerLists.value.toMutableMap().apply { put(name, list + villager) }
+        val newDictionary =
+            _dictOfVillagerLists.value.toMutableMap().apply { put(name,
+                (list + villager) as MutableList<Villager>
+            ) }
         _dictOfVillagerLists.value = newDictionary
     }
 
     fun removeVillagerFromCustomList(name: String, villager: Villager) {
         val list = _dictOfVillagerLists.value[name]?.toMutableList() ?: return
-        val newDictionary = _dictOfVillagerLists.value.toMutableMap().apply { put(name, list - villager) }
+        val newDictionary =
+            _dictOfVillagerLists.value.toMutableMap().apply { put(name,
+                (list - villager) as MutableList<Villager>
+            ) }
         _dictOfVillagerLists.value = newDictionary
     }
 
-    private val _mutableFavoritesList = MutableStateFlow(mutableListOf<Villager>(generateDummyVillager()))
-    val favoritesList : StateFlow<List<Villager>>
+    private val _mutableFavoritesList = MutableStateFlow(mutableListOf<Villager>())
+    val favoritesList: StateFlow<List<Villager>>
         get() = _mutableFavoritesList
 
     private val _isFavoritesList = MutableStateFlow<Boolean>(false)
@@ -92,11 +232,11 @@ class MainViewModel : ViewModel() {
     }
 
 
-    fun addFavoriteVillager(villager: Villager){
+    fun addFavoriteVillager(villager: Villager) {
         _mutableFavoritesList.value.add(villager)
     }
 
-    fun removeFavoriteVillager(villager: Villager){
+    fun removeFavoriteVillager(villager: Villager) {
         _mutableFavoritesList.value.remove(villager)
     }
 
@@ -105,81 +245,56 @@ class MainViewModel : ViewModel() {
     }
 
 
-    private fun fillVillagerData() : List<Villager>{
-        //TODO: GET DATA FROM API, FOR NOW DATA IS GENERATED WITH DUMMY VALUES FROM TEMP FUNCTION
-        return generateVillagerList(20)
-    }
+    fun <T> filterListForFavorites(inputList: List<T>, favoritesList: List<T>): List<T> {
+        val filteredList = mutableListOf<T>()
 
-    fun updateFilteredList() {
-        val iterator = _mutableVillagerListFiltered.value.iterator()
-        while (iterator.hasNext()) {
-            val item = iterator.next()
-            if (item in favoritesList.value) {
-                iterator.remove()
+        for (item in inputList) {
+            if (item !in favoritesList) {
+                filteredList.add(item)
             }
         }
 
+        return filteredList
     }
 
 
-    fun <T> copyRandomElements(inputList: List<T>, numElements: Int): List<T> {
-        if (numElements <= 0 || numElements > inputList.size) {
-            throw IllegalArgumentException("Number of elements to copy must be greater than 0 and less than or equal to the size of the input list.")
-        }
+//    fun updateFilteredList() {
+//        val iterator = _mutableVillagerListFiltered.value.iterator()
+//        while (iterator.hasNext()) {
+//            val item = iterator.next()
+//            if (item in favoritesList.value) {
+//                iterator.remove()
+//            }
+//        }
+//    }
+//
+//
+//    fun <T> copyRandomElements(inputList: List<T>, numElements: Int): List<T> {
+//        if (numElements <= 0 || numElements > inputList.size) {
+//            throw IllegalArgumentException("Number of elements to copy must be greater than 0 and less than or equal to the size of the input list.")
+//        }
+//
+//        val shuffledList = inputList.shuffled()
+//        return shuffledList.subList(0, numElements)
+//    }
 
-        val shuffledList = inputList.shuffled()
-        return shuffledList.subList(0, numElements)
+
+    sealed class VillagerEvent {
+        data class Success(val villagersList: List<Villager>) : VillagerEvent()
+        object Error : VillagerEvent()
+        object Loading : VillagerEvent()
     }
 
 
+}
 
-
-
-
-    companion object{//TODO: DUMMY GENERATED DATA GET RID OF AT SOME POINT????
-        private fun generateVillagerList(numberOfVillagers: Int) : List<Villager>{
-            val dummyList = mutableListOf<Villager>()
-            for (i in 0 until  numberOfVillagers){
-                dummyList.add(generateDummyVillager())
-            }
-            return dummyList
+class MainViewModelFactory(private val animalCrossingRepository: AnimalCrossingRepositoryImpl) :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainViewModel(animalCrossingRepository) as T
         }
-
-        private fun generateDummyVillager(): Villager {
-            val names = listOf("Bob", "Alice", "Tom", "Sally", "Charlie")
-            val personalities = listOf("Big sister", "Cranky", "Jock", "Lazy", "Normal", "Peppy", "Smug", "Snooty")
-            val months = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-            val days = (1..31).map { it.toString() }
-            val signs = listOf("Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces")
-            val colors = listOf("Red", "Blue", "Green", "Yellow", "Purple", "Orange", "Pink", "Brown", "Black", "White")
-
-            val random = Random.Default
-
-            return Villager(
-                name = names.random(),
-                gender = Gender.values().random(),
-                personality = Personality.values().random(),
-                species = Species.values().random(),
-                birthday = Birthday(months.random(), days.random()),
-                titleColor = generateRandomColor(),
-                textColor = generateRandomColor(),
-                id = "cat${random.nextInt(100)}",
-                nhDetails = NhDetails(
-                    iconUrl = "https://example.com/icon/${random.nextInt(100)}",
-                    quote = "Random quote ${random.nextInt(100)}",
-                    catchphrase = "Random catchphrase ${random.nextInt(100)}",
-                    favStyles = listOf("Style1", "Style2"),
-                    favColors = colors.shuffled().take(2),
-                    hobby = Hobby.values().random(),
-                    houseExteriorUrl = "https://example.com/house/${random.nextInt(100)}"
-                )
-            )
-        }
-
-        private fun generateRandomColor(): String {
-            val random = Random.Default
-            val color = random.nextInt(0xFFFFFF + 1)
-            return String.format("#%06X", color)
-        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

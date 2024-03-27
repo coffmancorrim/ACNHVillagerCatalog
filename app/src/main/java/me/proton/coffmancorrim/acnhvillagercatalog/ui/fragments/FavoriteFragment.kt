@@ -1,21 +1,16 @@
-package me.proton.coffmancorrim.acnhvillagercatalog
+package me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
-class DiscoverFragment : Fragment() {
-
+class FavoriteFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -23,7 +18,7 @@ class DiscoverFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        return inflater.inflate(R.layout.fragment_discover, container, false)
+        return inflater.inflate(R.layout.fragment_favorite, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,8 +30,11 @@ class DiscoverFragment : Fragment() {
         val villagersListFragment = VillagersListFragment()
         fragmentTransaction.replace(R.id.fragment_inner_container_view, villagersListFragment)
         fragmentTransaction.commit()
+    }
+
+    override fun onStop() {
+        super.onStop()
 
     }
 
 }
-

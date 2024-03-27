@@ -2,7 +2,6 @@ package me.proton.coffmancorrim.acnhvillagercatalog.ui
 
 import android.app.AlertDialog
 import android.content.Context
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +14,8 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import me.proton.coffmancorrim.acnhvillagercatalog.R
-import me.proton.coffmancorrim.acnhvillagercatalog.VillagersListFragment
+import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
-import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class ListOfNamesAdapter(

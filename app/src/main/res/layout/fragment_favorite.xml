@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FavoriteFragment"
+    tools:context=".ui.fragments.FavoriteFragment"
     android:clickable="false"
     >
 
@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:name="me.proton.coffmancorrim.acnhvillagercatalog.VillagersListFragment"
+        android:name="me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment"
         tools:layout="@layout/fragment_villagers_list" />
 
 
