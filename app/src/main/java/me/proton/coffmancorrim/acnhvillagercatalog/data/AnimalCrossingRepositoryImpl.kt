@@ -3,18 +3,15 @@ package me.proton.coffmancorrim.acnhvillagercatalog.data
 import android.util.Log
 import kotlinx.serialization.json.Json
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
-import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapperDao
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.model.VillagerResponse
-import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 class AnimalCrossingRepositoryImpl(
-//    private val animalCrossingApi: AnimalCrossingApi,
+    private val animalCrossingApiService: AnimalCrossingApi,
     private val villagerDao: VillagerDao,
     private val listWrapperDao: ListWrapperDao
 ) : AnimalCrossingRepository {
-    val animalCrossingApiService = RetrofitClient.apiService
 
     override suspend fun getVillagers(): VillagerResponse{
         val mockResponse = true

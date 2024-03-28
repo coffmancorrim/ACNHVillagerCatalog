@@ -7,19 +7,17 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.data.AnimalCrossingRepository
 import me.proton.coffmancorrim.acnhvillagercatalog.data.AnimalCrossingRepositoryImpl
 import me.proton.coffmancorrim.acnhvillagercatalog.data.VillagerDatabaseSingleton
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
-import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapperDatabase
+import me.proton.coffmancorrim.acnhvillagercatalog.data.ListWrapperDatabase
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.model.VillagerResponse
 
 class MainViewModel(
-    private val animalCrossingRepository: AnimalCrossingRepositoryImpl = AnimalCrossingRepositoryImpl(
-        VillagerDatabaseSingleton.getDatabase().villagerDao(),
-        ListWrapperDatabase.getDatabase().listWrapperDao()
-    )
-) : ViewModel() {
+    private val animalCrossingRepository: AnimalCrossingRepository
+    ) : ViewModel() {
     var customKey: String? = null
     var detailVillager: Villager? = null
     var reloadVillagerData: Boolean = true
@@ -251,6 +249,10 @@ class MainViewModel(
         object Error : VillagerEvent()
         object Loading : VillagerEvent()
     }
+}
 
-
+class MainViewModelFactory(private val repository: AnimalCrossingRepository): ViewModelProvider.Factory{
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return MainViewModel(repository) as T
+    }
 }

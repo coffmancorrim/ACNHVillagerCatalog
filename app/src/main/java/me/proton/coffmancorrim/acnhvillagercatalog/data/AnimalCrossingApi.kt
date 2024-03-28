@@ -18,20 +18,3 @@ interface AnimalCrossingApi {
     suspend fun getVillagers() : Response<List<Villager>>
 }
 
-object RetrofitClient {
-    private const val BASE_URL = "https://api.nookipedia.com/"
-
-    val json = Json { ignoreUnknownKeys = true }
-
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(json.asConverterFactory("application/json; charset=UTF8".toMediaType()))
-            .build()
-    }
-
-    val apiService: AnimalCrossingApi by lazy {
-        retrofit.create(AnimalCrossingApi::class.java)
-    }
-}
-

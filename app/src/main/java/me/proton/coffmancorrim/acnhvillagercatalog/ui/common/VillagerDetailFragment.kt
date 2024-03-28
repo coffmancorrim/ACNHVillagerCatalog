@@ -63,7 +63,7 @@ class VillagerDetailFragment : Fragment() {
         if (villager != null) {
             Glide
                 .with(this)
-                .load("ignorethis")
+                .load(villager.nhDetails.iconUrl)
                 .placeholder(R.drawable.placeholder)
                 .into(villagerIconImageView)
             villagerNameTextView.text = villager.name
@@ -80,7 +80,7 @@ class VillagerDetailFragment : Fragment() {
             textHobby.text = villager.nhDetails.hobby.name
             Glide
                 .with(this)
-                .load("ignorethis")
+                .load(villager.nhDetails.houseExteriorUrl)
                 .placeholder(R.drawable.placeholder)
                 .into(textHouseExteriorUrl)
         }

@@ -2,22 +2,19 @@ package me.proton.coffmancorrim.acnhvillagercatalog
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import me.proton.coffmancorrim.acnhvillagercatalog.data.VillagerDatabaseSingleton
-import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapperDatabase
+import me.proton.coffmancorrim.acnhvillagercatalog.data.ListWrapperDatabase
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.CustomListsFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.DiscoverFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.FavoriteFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.HomeFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
+import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
     private  lateinit var mainViewModel: MainViewModel
@@ -25,9 +22,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        VillagerDatabaseSingleton.createDatabase(this)
-        ListWrapperDatabase.createDatabase(this)
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        val mainViewModelFactory = MainViewModelFactory(AnimalCrossingApplication.appModule.animalCrossingRepository)
+        mainViewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
         bottomNavigationView.setOnItemSelectedListener{item ->
