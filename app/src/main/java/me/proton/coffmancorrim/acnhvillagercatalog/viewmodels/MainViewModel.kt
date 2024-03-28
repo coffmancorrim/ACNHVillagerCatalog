@@ -23,76 +23,84 @@ class MainViewModel(
     var customKey: String? = null
     var detailVillager: Villager? = null
     var reloadVillagerData: Boolean = true
-    var update = 0
 
     private val _mutableVillagerList: MutableStateFlow<VillagerEvent> =
         MutableStateFlow(VillagerEvent.Loading)
     val villagerList: StateFlow<VillagerEvent>
         get() = _mutableVillagerList
 
+    private val _listOfNames: MutableStateFlow<MutableList<ListWrapper>> =
+        MutableStateFlow(mutableListOf<ListWrapper>())
+    val listOfNames: StateFlow<List<ListWrapper>>
+        get() = _listOfNames
+
+    private val _dictOfVillagerLists: MutableStateFlow<MutableMap<String, MutableList<Villager>>> =
+        MutableStateFlow(mutableMapOf())
+    val dictOfVillagerLists: StateFlow<Map<String, List<Villager>>>
+        get() = _dictOfVillagerLists
+
+    private val _mutableFavoritesList = MutableStateFlow(mutableListOf<Villager>())
+    val favoritesList: StateFlow<List<Villager>>
+        get() = _mutableFavoritesList
+
+    private val _isFavoritesList = MutableStateFlow<Boolean>(false)
+    val isFavoritesList: StateFlow<Boolean>
+        get() = _isFavoritesList
+
+    private val _isListClickable = MutableStateFlow<Boolean>(true)
+    val isListClickable: StateFlow<Boolean>
+        get() = _isListClickable
 
     fun fillVillagerData() {
         viewModelScope.launch {
-            Log.d("RELOAD", reloadVillagerData.toString())
-            if (reloadVillagerData) {
-                if (_mutableVillagerList.value !is VillagerEvent.Loading) {
-                    _mutableVillagerList.value = VillagerEvent.Loading
+            if(villagerList.value is VillagerEvent.Error){
+                _mutableVillagerList.value = VillagerEvent.Loading
+            }
+
+            if (villagerList.value is VillagerEvent.Success){
+                Log.d("FILL_VILLAGER_DATA()", "VILLAGER DATA FOUND IN MEMORY")
+            } else if (animalCrossingRepository.getVillagersFromDao() is VillagerResponse.Success){
+                Log.d("FILL_VILLAGER_DATA()", "ATTEMPTING TO RETRIEVE DATA FROM LOCAL DATABASE")
+
+                if (animalCrossingRepository.getListWrapperDao() != null){
+                    _listOfNames.value = animalCrossingRepository.getListWrapperDao() as MutableList<ListWrapper>
                 }
 
-                //TODO PROBLEM DATA IS GET FROM API UNTILL THE USER CLOSES DOWN APP FOR FIRST TIME, REWRITE TO UPDATE DAO ON FIRST GET?
-                var localResponse = animalCrossingRepository.getVillagersFromDao()
-                if (localResponse is VillagerResponse.Success) {
-                    Log.d("FILL_VILLAGE_DATA()", "ATTEMPTING RETRIEVING DATA FROM LOCAL DATABASE")
+                val localResponse = animalCrossingRepository.getVillagersFromDao() as VillagerResponse.Success
+                _mutableVillagerList.value = VillagerEvent.Success(
+                    updateVillagersInMapWithListWrappersAndClear(
+                        localResponse.villagerList,
+                        _listOfNames.value,
+                        _dictOfVillagerLists.value
+                    )
+                )
 
-                    val localFavoritesResponse = animalCrossingRepository.getVillagersFromDao(true)
-                    Log.d("Debug", "Local favorites response: $localFavoritesResponse")
-                    if (update < 1) {
-
-                        val maybenull = animalCrossingRepository.getListWrapperDao()
-                        if (maybenull != null){
-                            _listOfNames.value = maybenull as MutableList<ListWrapper>
-
-                            localResponse = VillagerResponse.Success(
-                                updateVillagersInMapWithListWrappersAndClear(
-                                    localResponse.villagerList,
-                                    listOfNames.value,
-                                    _dictOfVillagerLists.value
-                                )
-                            )
-                        }
-
-                        if (localFavoritesResponse is VillagerResponse.Success) {
-                            _mutableFavoritesList.value =
-                                updateVillagersInMapWithListWrappersAndClear(
-                                    localFavoritesResponse.villagerList,
-                                    listOfNames.value,
-                                    _dictOfVillagerLists.value
-                                ) as MutableList<Villager>
-
-                        } else {
-                            Log.e("Debug", "Failed to get favorites list")
-                        }
-                        animalCrossingRepository.cleanseVillagerWrapperIds()
-                        update++
-                    }
-                    _mutableVillagerList.value = VillagerEvent.Success(localResponse.villagerList)
-                } else {
-                    Log.d("FILL_VILLAGE_DATA()", "ATTEMPTING RETRIEVING DATA FROM API")
-                    when (val response = animalCrossingRepository.getVillagers()) {
-                        is VillagerResponse.Success -> _mutableVillagerList.value =
-                            VillagerEvent.Success(response.villagerList)
-
-                        VillagerResponse.Error -> _mutableVillagerList.value = VillagerEvent.Error
-                    }
+                val localFavoritesResponse = animalCrossingRepository.getFavoriteVillagersFromDao()
+                if (localFavoritesResponse is VillagerResponse.Success){
+                    _mutableFavoritesList.value = updateVillagersInMapWithListWrappersAndClear(
+                        localFavoritesResponse.villagerList,
+                        _listOfNames.value,
+                        _dictOfVillagerLists.value
+                    ) as MutableList<Villager>
                 }
-
+                //purge the database of any VillagerWrapperIds, at the end of the apps lifecycle we create and add these values to the database
+                //we do not want any conflicts of Villagers in custom lists that do not exist, are not updated
+                animalCrossingRepository.cleanseVillagerWrapperIds()
             } else {
-                reloadVillagerData = true
+                Log.d("FILL_VILLAGER_DATA()", "ATTEMPTING TO RETRIEVE DATA FROM API")
+                when (val response = animalCrossingRepository.getVillagers()) {
+                    is VillagerResponse.Success -> {
+                        _mutableVillagerList.value = VillagerEvent.Success(response.villagerList)
+                        updateDao()
+                    }
+
+                    VillagerResponse.Error -> _mutableVillagerList.value = VillagerEvent.Error
+                }
             }
         }
     }
 
-    fun updateVillagersInMapWithListWrappersAndClear(
+    private fun updateVillagersInMapWithListWrappersAndClear(
         villagerList: List<Villager>,
         listWrapperList: List<ListWrapper>,
         villagerMap: MutableMap<String, MutableList<Villager>>
@@ -110,7 +118,7 @@ class MainViewModel(
                     }
                 }
                 // Clear the listWrapperIds after adding the villager to the map
-                // we do this because we have a function to add all the key data at the end of the activity life cycle
+                // we do this because we have a function to add all the Id data at the end of the activity life cycle
                 villager.listWrapperIds = null
                 Log.d("UPDATE_MAP_LIST_WRAPPERS", "Cleared listWrapperIds for villager: $villager")
             }
@@ -118,7 +126,6 @@ class MainViewModel(
 
         return villagerList
     }
-
 
     suspend fun updateDao() {
         Log.d("UpdateDao", "Updating DAO")
@@ -139,8 +146,7 @@ class MainViewModel(
         processVillagersByListWrapper(listOfNames.value, dictOfVillagerLists.value)
     }
 
-
-    suspend fun processVillagersByListWrapper(listWrapperList: List<ListWrapper>, villagerMap: Map<String, List<Villager>>) {
+    private suspend fun processVillagersByListWrapper(listWrapperList: List<ListWrapper>, villagerMap: Map<String, List<Villager>>) {
         for (listWrapper in listWrapperList) {
             val keyId = listWrapper.keyId
             val villagerList = villagerMap[keyId]
@@ -153,31 +159,8 @@ class MainViewModel(
         }
     }
 
-
-    private val _listOfNames: MutableStateFlow<MutableList<ListWrapper>> =
-        MutableStateFlow(mutableListOf<ListWrapper>())
-    val listOfNames: StateFlow<List<ListWrapper>>
-        get() = _listOfNames
-
-    private val _dictOfVillagerLists: MutableStateFlow<MutableMap<String, MutableList<Villager>>> =
-        MutableStateFlow(mutableMapOf())
-    val dictOfVillagerLists: StateFlow<Map<String, List<Villager>>>
-        get() = _dictOfVillagerLists
-
-
-    private val _isListClickable = MutableStateFlow<Boolean>(true)
-    val isListClickable: StateFlow<Boolean>
-        get() = _isListClickable
-
-    fun toggleIsListClickableBoolean() {
-        _isListClickable.value = !(_isListClickable.value)
-        Log.d("IS_CLICKABLE", "TOGGLED IS_LIST_CLICKABLE: " + _isListClickable.value.toString())
-    }
-
-
-    fun toggleReloadVillagerData() {
-        reloadVillagerData = !(reloadVillagerData)
-        Log.d("RELOAD", "toggleReloadVillagerData(): " + reloadVillagerData.toString())
+    fun isVillagerInList(itemToCheck: Villager, villagerList: List<Villager>): Boolean {
+        return itemToCheck in villagerList
     }
 
     fun addCustomListHelper() {
@@ -221,19 +204,6 @@ class MainViewModel(
         _dictOfVillagerLists.value = newDictionary
     }
 
-    private val _mutableFavoritesList = MutableStateFlow(mutableListOf<Villager>())
-    val favoritesList: StateFlow<List<Villager>>
-        get() = _mutableFavoritesList
-
-    private val _isFavoritesList = MutableStateFlow<Boolean>(false)
-    val isFavoritesList: StateFlow<Boolean>
-        get() = _isFavoritesList
-
-    fun toggleFavoritesBoolean() {
-        _isFavoritesList.value = !(_isFavoritesList.value)
-    }
-
-
     fun addFavoriteVillager(villager: Villager) {
         _mutableFavoritesList.value.add(villager)
     }
@@ -242,16 +212,10 @@ class MainViewModel(
         _mutableFavoritesList.value.remove(villager)
     }
 
-    fun isVillagerInList(itemToCheck: Villager, villagerList: List<Villager>): Boolean {
-        return itemToCheck in villagerList
-    }
-
     fun setFavorite(villagerId: String, favorite: Boolean) {
         for (villager in _mutableFavoritesList.value){
             if (villagerId == villager.id) {
                 villager.favorite = favorite
-            } else {
-                villager
             }
         }
     }
@@ -268,27 +232,19 @@ class MainViewModel(
         return filteredList
     }
 
+    fun toggleIsListClickableBoolean() {
+        _isListClickable.value = !(_isListClickable.value)
+        Log.d("IS_CLICKABLE", "TOGGLED IS_LIST_CLICKABLE: " + _isListClickable.value.toString())
+    }
 
-//    fun updateFilteredList() {
-//        val iterator = _mutableVillagerListFiltered.value.iterator()
-//        while (iterator.hasNext()) {
-//            val item = iterator.next()
-//            if (item in favoritesList.value) {
-//                iterator.remove()
-//            }
-//        }
-//    }
-//
-//
-//    fun <T> copyRandomElements(inputList: List<T>, numElements: Int): List<T> {
-//        if (numElements <= 0 || numElements > inputList.size) {
-//            throw IllegalArgumentException("Number of elements to copy must be greater than 0 and less than or equal to the size of the input list.")
-//        }
-//
-//        val shuffledList = inputList.shuffled()
-//        return shuffledList.subList(0, numElements)
-//    }
+    fun toggleReloadVillagerData() {
+        reloadVillagerData = !(reloadVillagerData)
+        Log.d("RELOAD", "toggleReloadVillagerData(): " + reloadVillagerData.toString())
+    }
 
+    fun toggleFavoritesBoolean() {
+        _isFavoritesList.value = !(_isFavoritesList.value)
+    }
 
     sealed class VillagerEvent {
         data class Success(val villagersList: List<Villager>) : VillagerEvent()
@@ -297,15 +253,4 @@ class MainViewModel(
     }
 
 
-}
-
-class MainViewModelFactory(private val animalCrossingRepository: AnimalCrossingRepositoryImpl) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MainViewModel(animalCrossingRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }
