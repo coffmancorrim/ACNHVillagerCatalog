@@ -40,8 +40,8 @@ class MainViewModel(
                 }
 
                 var localResponse = animalCrossingRepository.getVillagersFromDao()
-                Log.d("Debug", "Local response: $localResponse")
                 if (localResponse is VillagerResponse.Success) {
+                    Log.d("FILL_VILLAGE_DATA()", "ATTEMPTING RETRIEVING DATA FROM LOCAL DATABASE")
 
                     val localFavoritesResponse = animalCrossingRepository.getVillagersFromDao(true)
                     Log.d("Debug", "Local favorites response: $localFavoritesResponse")
@@ -76,6 +76,7 @@ class MainViewModel(
                     }
                     _mutableVillagerList.value = VillagerEvent.Success(localResponse.villagerList)
                 } else {
+                    Log.d("FILL_VILLAGE_DATA()", "ATTEMPTING RETRIEVING DATA FROM API")
                     when (val response = animalCrossingRepository.getVillagers()) {
                         is VillagerResponse.Success -> _mutableVillagerList.value =
                             VillagerEvent.Success(response.villagerList)
@@ -244,6 +245,15 @@ class MainViewModel(
         return itemToCheck in villagerList
     }
 
+    fun setFavorite(villagerId: String, favorite: Boolean) {
+        for (villager in _mutableFavoritesList.value){
+            if (villagerId == villager.id) {
+                villager.favorite = favorite
+            } else {
+                villager
+            }
+        }
+    }
 
     fun <T> filterListForFavorites(inputList: List<T>, favoritesList: List<T>): List<T> {
         val filteredList = mutableListOf<T>()

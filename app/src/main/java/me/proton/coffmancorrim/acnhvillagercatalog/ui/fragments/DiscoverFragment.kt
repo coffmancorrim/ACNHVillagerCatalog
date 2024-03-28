@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import me.proton.coffmancorrim.acnhvillagercatalog.R
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
+import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class DiscoverFragment : Fragment() {
-
     private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -25,13 +25,7 @@ class DiscoverFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
-        val fragmentTransaction = childFragmentManager.beginTransaction()
-        val villagersListFragment = VillagersListFragment()
-        fragmentTransaction.replace(R.id.fragment_inner_container_view, villagersListFragment)
-        fragmentTransaction.commit()
-
+        FragmentUtil.replaceFragment(childFragmentManager, VillagersListFragment(), R.id.fragment_inner_container_view)
     }
 
 }

@@ -15,11 +15,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 
 class HomeFragment : Fragment() {
-
     private val mainViewModel: MainViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -37,58 +37,44 @@ class HomeFragment : Fragment() {
         }
 
         val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
+        val fragmentManager = requireActivity().supportFragmentManager
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                val fragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_discover_container)
-                fragmentContainerView.visibility = View.VISIBLE
-                fragmentContainerView.setOnClickListener {
-                    Log.d("HOME_FRAGMENT", "ON_CLICK")
-                    bottomNavigationView.selectedItemId = R.id.item_discover
-
-                    if (mainViewModel.reloadVillagerData){
-                        mainViewModel.toggleReloadVillagerData()
-                    }
-                }
-
-                replaceFragment(DiscoverFragment(), fragmentContainerView.id)
+        val discoverFragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_discover_container)
+        val discoverOnClick = {
+            bottomNavigationView.selectedItemId = R.id.item_discover
+            if (mainViewModel.reloadVillagerData){
+                mainViewModel.toggleReloadVillagerData()
             }
         }
+        replaceFragmentForList(
+            fragmentManager,
+            DiscoverFragment(),
+            discoverFragmentContainerView,
+            bottomNavigationView,
+            R.id.item_discover,
+            discoverOnClick
+        )
 
         viewLifecycleOwner.lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.favoritesList.collect{list ->
-                    if (list.isNotEmpty()){
-                        val fragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_favorite_container)
-                        fragmentContainerView.visibility = View.VISIBLE
-                        fragmentContainerView.setOnClickListener {
-                            Log.d("HOME_FRAGMENT", "ON_CLICK")
-                            bottomNavigationView.selectedItemId = R.id.item_favorites
+                launch {
+                    mainViewModel.favoritesList.collect{list ->
+                        val favoritesFragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_favorite_container)
+                        if (list.isNotEmpty()){
+                            replaceFragmentForList(fragmentManager, FavoriteFragment(), favoritesFragmentContainerView, bottomNavigationView, R.id.item_favorites)
                         }
-
-                        replaceFragment(FavoriteFragment(), fragmentContainerView.id)
                     }
                 }
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.listOfNames.collect{list ->
-                    if (list.isNotEmpty()){
-                        val fragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_custom_container)
-                        fragmentContainerView.visibility = View.VISIBLE
-                        fragmentContainerView.setOnClickListener {
-                            Log.d("HOME_FRAGMENT", "ON_CLICK")
-                            bottomNavigationView.selectedItemId = R.id.item_custom
+                launch {
+                    mainViewModel.listOfNames.collect{list ->
+                        val customListsFragmentContainerView = view.findViewById<FragmentContainerView>(R.id.fragment_custom_container)
+                        if (list.isNotEmpty()) {
+                            replaceFragmentForList(fragmentManager, CustomListsFragment(), customListsFragmentContainerView, bottomNavigationView, R.id.item_custom)
                         }
-
-                        replaceFragment(CustomListsFragment(), fragmentContainerView.id)
                     }
                 }
             }
         }
-
 
     }
 
@@ -100,11 +86,25 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, fragmentContainerId: Int, fragmentManager: FragmentManager = childFragmentManager){
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(fragmentContainerId, fragment)
-        fragmentTransaction.addToBackStack(null)
-        fragmentTransaction.commit()
+    private fun replaceFragmentForList(
+        fragmentManager: FragmentManager,
+        fragment: Fragment,
+        fragmentContainerView: FragmentContainerView,
+        bottomNavigationView: BottomNavigationView,
+        itemId: Int,
+        onClick: (() -> Unit)? = null
+    ) {
+        fragmentContainerView.visibility = View.VISIBLE
+        if(onClick != null){
+            fragmentContainerView.setOnClickListener {
+                onClick.invoke()
+            }
+        }else{
+            fragmentContainerView.setOnClickListener {
+                bottomNavigationView.selectedItemId = itemId
+            }
+        }
+        FragmentUtil.replaceFragment(fragmentManager, fragment, fragmentContainerView.id)
     }
 
 }

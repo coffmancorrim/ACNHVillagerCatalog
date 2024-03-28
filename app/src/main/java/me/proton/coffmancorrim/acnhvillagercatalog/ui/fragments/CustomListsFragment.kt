@@ -37,13 +37,10 @@ class CustomListsFragment : Fragment() {
         val addButton = view.findViewById<ImageView>(R.id.image_add_icon)
         val searchView = view.findViewById<SearchView>(R.id.search_custom_lists)
 
-        if(!mainViewModel.isListClickable.value){
+        if (!mainViewModel.isListClickable.value) {
             searchView.visibility = View.GONE
-        }
-
-        if (!mainViewModel.isListClickable.value){
             addButton.visibility = View.GONE
-        }else{
+        } else {
             addButton.visibility = View.VISIBLE
         }
 
@@ -86,8 +83,5 @@ class CustomListsFragment : Fragment() {
             }
         )
     }
-
-
-
 
 }
