@@ -39,6 +39,7 @@ class MainViewModel(
                     _mutableVillagerList.value = VillagerEvent.Loading
                 }
 
+                //TODO PROBLEM DATA IS GET FROM API UNTILL THE USER CLOSES DOWN APP FOR FIRST TIME, REWRITE TO UPDATE DAO ON FIRST GET?
                 var localResponse = animalCrossingRepository.getVillagersFromDao()
                 if (localResponse is VillagerResponse.Success) {
                     Log.d("FILL_VILLAGE_DATA()", "ATTEMPTING RETRIEVING DATA FROM LOCAL DATABASE")

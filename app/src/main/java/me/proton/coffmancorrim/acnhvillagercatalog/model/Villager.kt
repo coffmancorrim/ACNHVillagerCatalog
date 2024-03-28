@@ -70,6 +70,7 @@ enum class Gender {
 
 @Serializable
 enum class Personality {
+    @SerialName("Big sister")
     BigSister,
     Cranky,
     Jock,
@@ -86,6 +87,7 @@ enum class Species {
     Alligator,
     Anteater,
     Bear,
+    @SerialName("Bear cub")
     BearCub,
     Bird,
     Bull,

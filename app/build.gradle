@@ -4,10 +4,17 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization'
     id("com.google.devtools.ksp")
 }
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
     namespace 'me.proton.coffmancorrim.acnhvillagercatalog'
     compileSdk 34
+
+    buildFeatures{
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId "me.proton.coffmancorrim.acnhvillagercatalog"
@@ -17,6 +24,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "API_KEY", apikeyProperties['API_KEY'])
     }
 
     buildTypes {
