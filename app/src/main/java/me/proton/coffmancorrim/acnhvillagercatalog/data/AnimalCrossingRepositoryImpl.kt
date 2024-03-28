@@ -6,6 +6,8 @@ import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapperDao
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.model.VillagerResponse
+import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 class AnimalCrossingRepositoryImpl(
 //    private val animalCrossingApi: AnimalCrossingApi,
@@ -23,7 +25,7 @@ class AnimalCrossingRepositoryImpl(
             result = animalCrossingApiService.getVillagers()
         }else{
             Log.d("AnimalCrossingApi", "mockResponse is true: retrieving data from test json")
-            result = mockRetrofitResponse()
+            result = mockRetrofitResponse(true)
         }
 
         if (result.isSuccessful) {
@@ -89,10 +91,17 @@ class AnimalCrossingRepositoryImpl(
         villagerDao.insertAllVillagers(villagerList)
     }
 
-    private fun mockRetrofitResponse(): Response<List<Villager>> {
-        val jsonConfig = Json{ignoreUnknownKeys = true}
-        val villagers = jsonConfig.decodeFromString<List<Villager>>(TestJsonWrapper.testJson)
-        return Response.success(villagers)
+    private fun mockRetrofitResponse(returnSuccess: Boolean): Response<List<Villager>> {
+        if (returnSuccess){
+            val jsonConfig = Json{ignoreUnknownKeys = true}
+            val villagers = jsonConfig.decodeFromString<List<Villager>>(TestJsonWrapper.testJson)
+            return Response.success(villagers)
+        } else {
+            val errorBody =
+                "This is a mock response representing an error to the api".toResponseBody(null)
+            return Response.error(404, errorBody)
+        }
+
     }
 
 }
