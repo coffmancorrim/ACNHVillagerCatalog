@@ -2,14 +2,8 @@
 
 Welcome to ACNHCatalog, an Android application dedicated to exploring and managing villagers from the popular game Animal Crossing: New Horizons. This project utilizes modern Android development techniques and libraries to provide a seamless user experience.
 
-## Features
 
-- **Home Screen:** Central hub for navigating through different sections of the app.
-- **Discover Screen:** Browse through a comprehensive list of all available villagers.
-- **Favorites Screen:** View and manage your favorite villagers. Easily add or remove villagers from your favorites list.
-- **Custom Lists Screen:** Create and manage custom lists to categorize villagers according to your preferences.
-- **Villager Detail Screen:** Explore detailed information about each villager, including their name, species, and birth month.
-- **Search Bar:** Filter the villagers by name, species, or birth months.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/9f7540c8-6b06-4808-bb57-7c54264da01c" width="200px">
 
 ## Technologies Used
 
@@ -24,27 +18,25 @@ Welcome to ACNHCatalog, an Android application dedicated to exploring and managi
 - **Retrofit:** Communicate with the API to fetch data about Animal Crossing villagers.
 - **SearchView:** Implement a search functionality to filter villagers based on their names, species, or birth months.
 
-## Screenshots
+## Features
 
-Here are some screenshots showcasing different parts of the ACNHCatalog app:
+- **Home Screen:** Central hub for navigating through different sections of the app.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/b513aec0-fb3b-4032-bf3a-6885c0ea0b75" width="200px">
 
-1. **Home Screen:**
-   ![Home Screen](/path/to/home_screen_screenshot.png)
+- **Discover Screen:** Browse through a comprehensive list of all available villagers.
+- **Favorites Screen:** View and manage your favorite villagers. Easily add or remove villagers from your favorites list.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/381fdd2a-de1f-439c-a7f9-1d2858898e96" width="200px">
 
-2. **Discover Tab:**
-   ![Discover Tab](/path/to/discover_tab_screenshot.png)
+- **Custom Lists Screen:** Create and manage custom lists to categorize villagers according to your preferences.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/d76807cd-15f6-446f-81a4-42f5d9781457" width="200px">
 
-3. **Favorites Tab:**
-   ![Favorites Tab](/path/to/favorites_tab_screenshot.png)
+- **Villager Detail Screen:** Explore detailed information about each villager, including their name, species, and birth month.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/1e52822c-f5a3-47f3-8923-12d7b5f6fb33" width="200px">
 
-4. **Custom Lists Tab:**
-   ![Custom Lists Tab](/path/to/custom_lists_tab_screenshot.png)
-
-5. **Villager Detail Screen:**
-   ![Villager Detail Screen](/path/to/villager_detail_screen_screenshot.png)
+- **Search Bar:** Filter the villagers by name, species, or birth months.
+<img src="https://github.com/coffmancorrim/ACNHVillagerCatalog/assets/104328482/c456f5b8-dd00-4b6c-817c-8a9d633e74f6" width="200px">
 
 ## Installation
-
 To run the ACNHCatalog app locally, follow these steps:
 
 1. Clone this repository to your local machine.
