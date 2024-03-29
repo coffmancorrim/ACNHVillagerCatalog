@@ -42,3 +42,5 @@ To run the ACNHCatalog app locally, follow these steps:
 1. Clone this repository to your local machine.
 2. Open the project in Android Studio.
 3. Build and run the app on an Android emulator or physical device.
+
+**Note** - To run the app and retreive data from the api you will have to request access and get a api key. You can switch to retrieve data locally from a json file (to simulate a api call) by changing the mockResponse variable to true, in the AnimalCrossingRepositoryImpl class (located in the data package).
