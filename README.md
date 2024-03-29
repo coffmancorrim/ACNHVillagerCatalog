@@ -5,10 +5,11 @@ Welcome to ACNHCatalog, an Android application dedicated to exploring and managi
 ## Features
 
 - **Home Screen:** Central hub for navigating through different sections of the app.
-- **Discover:** Browse through a comprehensive list of all available villagers.
-- **Favorites:** View and manage your favorite villagers. Easily add or remove villagers from your favorites list.
-- **Custom Lists:** Create and manage custom lists to categorize villagers according to your preferences.
+- **Discover Screen:** Browse through a comprehensive list of all available villagers.
+- **Favorites Screen:** View and manage your favorite villagers. Easily add or remove villagers from your favorites list.
+- **Custom Lists Screen:** Create and manage custom lists to categorize villagers according to your preferences.
 - **Villager Detail Screen:** Explore detailed information about each villager, including their name, species, and birth month.
+- **Search Bar:** Filter the villagers by name, species, or birth months.
 
 ## Technologies Used
 
