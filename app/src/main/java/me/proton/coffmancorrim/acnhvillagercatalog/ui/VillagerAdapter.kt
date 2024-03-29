@@ -2,6 +2,8 @@ package me.proton.coffmancorrim.acnhvillagercatalog.ui
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +21,7 @@ import me.proton.coffmancorrim.acnhvillagercatalog.databinding.ItemVillagerBindi
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagerDetailFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
+import me.proton.coffmancorrim.acnhvillagercatalog.util.BirthdayStringUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
@@ -41,7 +44,7 @@ class VillagerAdapter(
     inner class VillagerViewHolder(private val binding: ItemVillagerBinding) : RecyclerView.ViewHolder(binding.root) {
         val imageVillagerIcon: ImageView = binding.imageVillagerIcon
         val textVillagerName: TextView = binding.textVillagerName
-        val textVillagerCatchPhrase: TextView = binding.textVillagerCatchphrase
+        val textVillagerBirthDate: TextView = binding.textVillagerBirthdate
         val optionsIcon: ImageView = binding.iconOptions
         val favoritesIcon: ImageView = binding.iconFavorite
         val favoritesIconFilled: ImageView = binding.iconFavoriteFilled
@@ -51,6 +54,9 @@ class VillagerAdapter(
     override fun onBindViewHolder(villagerViewHolder: VillagerViewHolder, position: Int) {
         val villager = filteredList[position]
 
+        val backgroundCircle = ShapeDrawable(OvalShape())
+        backgroundCircle.paint.color = Color.parseColor("#${villager.textColor}")
+        villagerViewHolder.imageVillagerIcon.background = backgroundCircle
         Glide
             .with(villagerViewHolder.itemView.context)
             .load(villager.nhDetails.iconUrl)
@@ -58,14 +64,18 @@ class VillagerAdapter(
             .into(villagerViewHolder.imageVillagerIcon)
 
         villagerViewHolder.textVillagerName.text = villager.name
-        villagerViewHolder.textVillagerCatchPhrase.text = villager.nhDetails.catchphrase
+        villagerViewHolder.textVillagerBirthDate.text = BirthdayStringUtil.formatBirthdayString(villager.birthdayMonth, villager.birthdayDay)
+        val textColor = Color.parseColor("#${villager.textColor}")
+        villagerViewHolder.textVillagerName.setTextColor(textColor)
+        villagerViewHolder.textVillagerBirthDate.setTextColor(textColor)
+        villagerViewHolder.itemView.setBackgroundColor(Color.parseColor("#${villager.titleColor}"))
 
         if (mainViewModel.isVillagerInList(villager, mainViewModel.favoritesList.value)){
             villagerViewHolder.favoritesIcon.visibility = View.GONE
             villagerViewHolder.favoritesIconFilled.visibility = View.VISIBLE
         }
 
-        villagerViewHolder.itemView.setBackgroundColor(Color.parseColor("#${villager.titleColor}"))
+
 
         villagerViewHolder.favoritesIcon.setOnClickListener {
             if (villagerViewHolder.favoritesIcon.visibility == View.VISIBLE){

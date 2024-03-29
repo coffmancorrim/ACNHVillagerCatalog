@@ -16,7 +16,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="FAVORITES FRAGMENT" />
+        android:text="Favorites"
+        android:textSize="36dp"
+        />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_inner_container_view"

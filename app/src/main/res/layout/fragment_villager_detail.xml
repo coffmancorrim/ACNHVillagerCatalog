@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/fragment_villager_detail"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,122 +8,321 @@
     android:orientation="vertical">
 
     <ImageView
+        android:id="@+id/image_villager_background_color"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/text_villager_personality"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        tools:background="@color/steel_blue"
+        android:layout_marginBottom="-8dp"
+        />
+
+    <ImageView
         android:id="@+id/image_villager_icon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         tools:src="@drawable/placeholder"
         android:contentDescription="Villager Icon"
-        tools:ignore="ContentDescription"/>
+        tools:ignore="ContentDescription"
+        tools:background="@drawable/drawable_circle"
+        />
 
     <TextView
         android:id="@+id/text_villager_name"
+        app:layout_constraintStart_toStartOf="@id/image_villager_icon"
+        app:layout_constraintEnd_toEndOf="@id/image_villager_icon"
+        app:layout_constraintTop_toBottomOf="@id/image_villager_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_gravity="center_horizontal"
         android:paddingTop="8dp"
-        tools:text="Villager Name"/>
+        tools:text="Villager Name"
+        />
 
     <TextView
         android:id="@+id/text_villager_gender"
+        app:layout_constraintTop_toBottomOf="@id/text_villager_name"
+        app:layout_constraintStart_toStartOf="@id/text_villager_name"
+        app:layout_constraintEnd_toEndOf="@id/text_villager_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_gravity="center_horizontal"
         android:paddingTop="8dp"
-        tools:text="Gender"/>
+        tools:text="Gender"
+        />
 
     <TextView
         android:id="@+id/text_villager_personality"
+        app:layout_constraintTop_toBottomOf="@id/text_villager_gender"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_gravity="center_horizontal"
         android:paddingTop="8dp"
-        tools:text="Personality"/>
+        tools:text="Personality"
+        />
 
     <TextView
-        android:id="@+id/text_villager_species"
-        android:layout_width="wrap_content"
+        android:id="@+id/text_header_species"
+        android:text="Species"
+        app:layout_constraintTop_toBottomOf="@id/image_villager_background_color"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_width="128dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Species"/>
+        tools:text="Species"
+        android:textStyle="bold"
+        />
+    <TextView
+        android:id="@+id/text_villager_species"
+        app:layout_constraintStart_toEndOf="@id/text_header_species"
+        app:layout_constraintTop_toTopOf="@id/text_header_species"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
+        android:layout_gravity="center_horizontal"
+        tools:text="Species"
+        />
+
+    <TextView
+        android:id="@+id/text_header_birthday"
+        app:layout_constraintTop_toBottomOf="@id/text_header_species"
+        app:layout_constraintStart_toStartOf="@id/text_header_species"
+        android:layout_width="128dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Birthday"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_villager_birthday"
-        android:layout_width="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_birthday"
+        app:layout_constraintTop_toTopOf="@id/text_header_birthday"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
         tools:text="Birthday"/>
 
     <TextView
-        android:id="@+id/text_villager_id"
-        android:layout_width="wrap_content"
+        android:id="@+id/text_header_quote"
+        android:text="Quote"
+        app:layout_constraintTop_toBottomOf="@id/text_header_birthday"
+        app:layout_constraintStart_toStartOf="@id/text_header_birthday"
+        android:layout_width="128dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Villager ID"/>
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_quote"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_quote"
+        app:layout_constraintTop_toTopOf="@id/text_header_quote"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
+        tools:text="Quote very long quote quote very long quote quote very long quote "
+        />
+
+    <TextView
+        android:id="@+id/text_header_catchphrase"
+        app:layout_constraintTop_toBottomOf="@id/text_quote"
+        app:layout_constraintStart_toStartOf="@id/text_header_quote"
+        android:layout_width="128dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Quote"/>
+        android:text="Catchphrase"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_catchphrase"
-        android:layout_width="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_catchphrase"
+        app:layout_constraintTop_toTopOf="@id/text_header_catchphrase"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Catchphrase"/>
+        tools:text="Catchphrase"
+        />
+
+    <TextView
+        android:id="@+id/text_header_fav_styles"
+        app:layout_constraintTop_toBottomOf="@id/text_header_catchphrase"
+        app:layout_constraintStart_toStartOf="@id/text_header_catchphrase"
+        android:layout_width="128dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Fav Styles"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_fav_styles"
-        android:layout_width="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_fav_styles"
+        app:layout_constraintTop_toTopOf="@id/text_header_fav_styles"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Favorite Styles"/>
+        tools:text="Favorite Styles"
+        />
+
+    <TextView
+        android:id="@+id/text_header_fav_colors"
+        app:layout_constraintTop_toBottomOf="@id/text_header_fav_styles"
+        app:layout_constraintStart_toStartOf="@id/text_header_fav_styles"
+        android:layout_width="128dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:layout_gravity="center_horizontal"
+        android:text="Fav Colors"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_fav_colors"
-        android:layout_width="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_fav_colors"
+        app:layout_constraintTop_toTopOf="@id/text_header_fav_colors"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
+        android:layout_gravity="center_horizontal"
+        tools:text="Favorite Colors"
+        />
+
+    <TextView
+        android:id="@+id/text_header_hobby"
+        app:layout_constraintTop_toBottomOf="@id/text_header_fav_colors"
+        app:layout_constraintStart_toStartOf="@id/text_header_fav_colors"
+        android:layout_width="128dp"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
-        tools:text="Favorite Colors"/>
+        android:text="Hobby"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/text_hobby"
-        android:layout_width="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/text_header_hobby"
+        app:layout_constraintTop_toTopOf="@id/text_header_hobby"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="16sp"
+        android:paddingHorizontal="16dp"
+        android:layout_marginEnd="64dp"
+        android:layout_gravity="center_horizontal"
+        tools:text="Hobby"
+        />
+
+
+    <ImageView
+        android:id="@+id/image_outer_background"
+        app:layout_constraintTop_toBottomOf="@id/text_house"
+        app:layout_constraintStart_toStartOf="@id/text_house"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
         android:layout_gravity="center_horizontal"
         android:paddingTop="8dp"
-        tools:text="Hobby"/>
+        tools:background="@color/steel_blue"
+        />
 
     <ImageView
         android:id="@+id/text_house_exterior_url"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        tools:src="@drawable/placeholder"
+        app:layout_constraintTop_toTopOf="@id/image_outer_background"
+        app:layout_constraintStart_toStartOf="@id/image_outer_background"
+        app:layout_constraintEnd_toEndOf="@id/image_outer_background"
+        app:layout_constraintBottom_toBottomOf="@id/image_outer_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="8dp"
+        tools:src="@drawable/placeholder_house"
         android:layout_gravity="center_horizontal"
-        android:paddingTop="8dp"
+        android:padding="16dp"
+        tools:background="@color/white"
         />
 
-</LinearLayout>
+
+
+    <TextView
+        android:id="@+id/text_house"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/text_header_hobby"
+        app:layout_constraintStart_toStartOf="@id/text_header_hobby"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="8dp"
+        android:textStyle="bold"
+        android:text="House Exterior"
+        />
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

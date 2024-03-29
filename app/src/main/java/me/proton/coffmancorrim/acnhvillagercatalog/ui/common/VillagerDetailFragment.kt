@@ -1,5 +1,8 @@
 package me.proton.coffmancorrim.acnhvillagercatalog.ui.common
 
+import android.graphics.Color
+import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.shapes.OvalShape
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -33,6 +36,38 @@ class VillagerDetailFragment : Fragment() {
 
         val villager = mainViewModel.detailVillager
         if (villager != null) {
+
+            val backgroundColor = Color.parseColor("#${villager.titleColor}")
+            val textColor = Color.parseColor("#${villager.textColor}")
+            binding.imageVillagerBackgroundColor.setBackgroundColor(backgroundColor)
+            binding.textHeaderCatchphrase.setBackgroundColor(backgroundColor)
+            binding.textHeaderBirthday.setBackgroundColor(backgroundColor)
+            binding.textHeaderFavColors.setBackgroundColor(backgroundColor)
+            binding.textHeaderHobby.setBackgroundColor(backgroundColor)
+            binding.textHeaderQuote.setBackgroundColor(backgroundColor)
+            binding.textHeaderFavStyles.setBackgroundColor(backgroundColor)
+            binding.textHeaderSpecies.setBackgroundColor(backgroundColor)
+            binding.textHouse.setBackgroundColor(backgroundColor)
+            binding.imageOuterBackground.setBackgroundColor(backgroundColor)
+
+            binding.textHeaderCatchphrase.setTextColor(textColor)
+            binding.textHeaderBirthday.setTextColor(textColor)
+            binding.textHeaderFavColors.setTextColor(textColor)
+            binding.textHeaderHobby.setTextColor(textColor)
+            binding.textHeaderQuote.setTextColor(textColor)
+            binding.textHeaderFavStyles.setTextColor(textColor)
+            binding.textHeaderSpecies.setTextColor(textColor)
+            binding.textHouse.setTextColor(textColor)
+            binding.textHouseExteriorUrl.setBackgroundColor(textColor)
+
+
+            binding.textVillagerName.setTextColor(textColor)
+            binding.textVillagerGender.setTextColor(textColor)
+            binding.textVillagerPersonality.setTextColor(textColor)
+
+            val backgroundCircle = ShapeDrawable(OvalShape())
+            backgroundCircle.paint.color = Color.parseColor("#${villager.textColor}")
+            binding.imageVillagerIcon.background = backgroundCircle
             Glide
                 .with(this)
                 .load(villager.nhDetails.iconUrl)
@@ -44,7 +79,6 @@ class VillagerDetailFragment : Fragment() {
             binding.textVillagerPersonality.text = villager.personality.name
             binding.textVillagerSpecies.text = villager.species.name
             binding.textVillagerBirthday.text = "${villager.birthdayMonth} ${villager.birthdayDay}"
-            binding.textVillagerId.text = villager.id
 
             binding.textQuote.text = villager.nhDetails.quote
             binding.textCatchphrase.text = villager.nhDetails.catchphrase

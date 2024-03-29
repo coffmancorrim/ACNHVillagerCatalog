@@ -16,7 +16,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="CUSTOM LIST FRAGMENT" />
+        android:text="Custom Lists"
+        android:textSize="36dp"
+        />
 
     <LinearLayout
         android:id="@+id/linear_wrapper"
