@@ -14,6 +14,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.ItemListNameBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
 import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
@@ -30,15 +31,15 @@ class ListOfNamesAdapter(
     private var filteredList: List<ListWrapper> = listOfNames
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ListOfNamesHolder {
-        val itemView = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_list_name, viewGroup, false)
-        return ListOfNamesHolder(itemView)
+        val binding = ItemListNameBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
+        return ListOfNamesHolder(binding)
     }
 
-    inner class ListOfNamesHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val listName = itemView.findViewById<TextView>(R.id.text_list_name)
-        val listSize = itemView.findViewById<TextView>(R.id.text_list_size)
-        val imageOptionsIcon = itemView.findViewById<ImageView>(R.id.icon_more_horizontal)
-        val disableView = itemView.findViewById<View>(R.id.viewDisableLayout)
+    inner class ListOfNamesHolder(private val binding: ItemListNameBinding) : RecyclerView.ViewHolder(binding.root) {
+        val listName = binding.textListName
+        val listSize = binding.textListSize
+        val imageOptionsIcon = binding.iconMoreHorizontal
+        val disableView = binding.viewDisableLayout
     }
 
 

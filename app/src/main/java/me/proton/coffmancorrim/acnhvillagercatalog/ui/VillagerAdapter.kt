@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.ItemVillagerBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagerDetailFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.model.ListWrapper
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
@@ -33,19 +34,18 @@ class VillagerAdapter(
     private var filteredList: List<Villager> = villagerList
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): VillagerViewHolder {
-        val itemView = LayoutInflater.from(viewGroup.context).inflate(R.layout.item_villager, viewGroup, false)
-        return VillagerViewHolder(itemView)
+        val binding = ItemVillagerBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
+        return VillagerViewHolder(binding)
     }
 
-    inner class VillagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageVillagerIcon: ImageView = itemView.findViewById<ImageView>(R.id.image_villager_icon)
-        val textVillagerName: TextView = itemView.findViewById<TextView>(R.id.text_villager_name)
-        val textVillagerCatchPhrase: TextView = itemView.findViewById<TextView>(R.id.text_villager_catchphrase)
-        val optionsIcon: ImageView = itemView.findViewById<ImageView>(R.id.icon_options)
-        val favoritesIcon: ImageView = itemView.findViewById<ImageView>(R.id.icon_favorite)
-        val favoritesIconFilled: ImageView = itemView.findViewById<ImageView>(R.id.icon_favorite_filled)
-        val disableView: View = itemView.findViewById<View>(R.id.viewDisableLayout)
-
+    inner class VillagerViewHolder(private val binding: ItemVillagerBinding) : RecyclerView.ViewHolder(binding.root) {
+        val imageVillagerIcon: ImageView = binding.imageVillagerIcon
+        val textVillagerName: TextView = binding.textVillagerName
+        val textVillagerCatchPhrase: TextView = binding.textVillagerCatchphrase
+        val optionsIcon: ImageView = binding.iconOptions
+        val favoritesIcon: ImageView = binding.iconFavorite
+        val favoritesIconFilled: ImageView = binding.iconFavoriteFilled
+        val disableView: View = binding.viewDisableLayout
     }
 
     override fun onBindViewHolder(villagerViewHolder: VillagerViewHolder, position: Int) {
@@ -86,7 +86,7 @@ class VillagerAdapter(
                 mainViewModel.removeFavoriteVillager(villager)
 
                 if (mainViewModel.isFavoritesList.value){
-                    notifyDataSetChanged() //TODO tried to use notifyDataSetChanged at POS but it caused bugs, so this will do for now
+                    notifyDataSetChanged()
                 }
             }
         }
@@ -100,7 +100,7 @@ class VillagerAdapter(
             villagerViewHolder.disableView.setOnClickListener {
                 bottomNavigationView.selectedItemId = parentId
                 Log.d("RELOAD", "ON CLICK VILLAGER VIEW HOLDER")
-                if (mainViewModel.reloadVillagerData && parentId == R.id.item_discover){ //TODO This may be broken check fix this later
+                if (mainViewModel.reloadVillagerData && parentId == R.id.item_discover){
                     mainViewModel.toggleReloadVillagerData()
                 }
             }

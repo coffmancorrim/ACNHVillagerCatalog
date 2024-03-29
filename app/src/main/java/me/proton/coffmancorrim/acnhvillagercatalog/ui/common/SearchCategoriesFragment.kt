@@ -6,20 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentSearchCategoriesBinding
 
 class SearchCategoriesFragment : Fragment() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var binding: FragmentSearchCategoriesBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(R.layout.fragment_search_categories, container, false)
+    ): View {
+        binding = FragmentSearchCategoriesBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
 }

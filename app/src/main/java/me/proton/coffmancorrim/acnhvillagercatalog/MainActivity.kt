@@ -8,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 import me.proton.coffmancorrim.acnhvillagercatalog.data.VillagerDatabaseSingleton
 import me.proton.coffmancorrim.acnhvillagercatalog.data.ListWrapperDatabase
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.ActivityMainBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.CustomListsFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.DiscoverFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.fragments.FavoriteFragment
@@ -17,18 +18,21 @@ import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModelFactory
 
 class MainActivity : AppCompatActivity() {
-    private  lateinit var mainViewModel: MainViewModel
+    private lateinit var mainViewModel: MainViewModel
+    lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val mainViewModelFactory = MainViewModelFactory(AnimalCrossingApplication.appModule.animalCrossingRepository)
         mainViewModel = ViewModelProvider(this, mainViewModelFactory).get(MainViewModel::class.java)
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        val bottomNavigationView = binding.bottomNav
 
-        bottomNavigationView.setOnItemSelectedListener{item ->
-            when (item.itemId){
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
                 R.id.item_home -> {
                     FragmentUtil.replaceFragment(supportFragmentManager, HomeFragment(), R.id.fragment_container_view)
                 }
@@ -51,9 +55,8 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
 
-        lifecycleScope.launch(){
+        lifecycleScope.launch {
             mainViewModel.updateDao()
         }
     }
-
 }

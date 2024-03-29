@@ -15,27 +15,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.MainActivity
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentCustomListsBinding
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentDiscoverBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.ListOfNamesAdapter
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class CustomListsFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
+    private lateinit var binding: FragmentCustomListsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(R.layout.fragment_custom_lists, container, false)
+    ): View {
+        binding = FragmentCustomListsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
-        val addButton = view.findViewById<ImageView>(R.id.image_add_icon)
-        val searchView = view.findViewById<SearchView>(R.id.search_custom_lists)
+        val bottomNavigationView = (requireActivity() as MainActivity).binding.bottomNav
+        val addButton = binding.imageAddIcon
+        val searchView = binding.searchCustomLists
 
         if (!mainViewModel.isListClickable.value) {
             searchView.visibility = View.GONE
@@ -44,7 +48,7 @@ class CustomListsFragment : Fragment() {
             addButton.visibility = View.VISIBLE
         }
 
-        val customListsRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_custom_list)
+        val customListsRecyclerView = binding.recyclerCustomList
         customListsRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -66,7 +70,6 @@ class CustomListsFragment : Fragment() {
                 }
             }
         }
-
     }
 
     private fun setupSearchView(searchView: SearchView, adapter: ListOfNamesAdapter) {

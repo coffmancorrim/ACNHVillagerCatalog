@@ -7,24 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentFavoriteBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class FavoriteFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
+    private lateinit var binding: FragmentFavoriteBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(R.layout.fragment_favorite, container, false)
+    ): View {
+        binding = FragmentFavoriteBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         FragmentUtil.replaceFragment(childFragmentManager, VillagersListFragment(), R.id.fragment_inner_container_view)
     }
 

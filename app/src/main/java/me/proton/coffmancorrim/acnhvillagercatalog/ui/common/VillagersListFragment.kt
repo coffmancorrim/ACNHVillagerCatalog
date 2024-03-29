@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
+import me.proton.coffmancorrim.acnhvillagercatalog.MainActivity
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentVillagersListBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.model.Villager
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.VillagerAdapter
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
@@ -26,26 +28,26 @@ class VillagersListFragment : Fragment(){
     private lateinit var villagerRecyclerView: RecyclerView
     private val mainViewModel: MainViewModel by activityViewModels()
     private lateinit var parentView: View
+    private lateinit var binding: FragmentVillagersListBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_villagers_list, container, false)
-        villagerRecyclerView = rootView.findViewById(R.id.recycler_villager)
+    ): View {
+        binding = FragmentVillagersListBinding.inflate(inflater, container, false)
+        villagerRecyclerView = binding.recyclerVillager
 
-        return rootView
+        return binding.root
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         mainViewModel.fillVillagerData()
 
-        val bottomNavigationView = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
-        val searchView = view.findViewById<SearchView>(R.id.search_villagers)
+        val bottomNavigationView = (requireActivity() as MainActivity).binding.bottomNav
+        val searchView = binding.searchVillagers
 
         if(!mainViewModel.isListClickable.value){
             searchView.visibility = View.GONE

@@ -12,7 +12,6 @@ class AnimalCrossingApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         appModule = AppModuleImpl(this)
     }
 }

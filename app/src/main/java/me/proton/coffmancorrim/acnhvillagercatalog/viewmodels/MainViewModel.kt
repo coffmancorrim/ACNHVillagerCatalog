@@ -104,10 +104,9 @@ class MainViewModel(
         villagerMap: MutableMap<String, MutableList<Villager>>
     ): List<Villager> {
         for (villager in villagerList) {
-            Log.d("UPDATE_MAP_LIST_WRAPPERS", "Processing villager: $villager")
             villager.listWrapperIds?.let { listWrapperIds ->
+                Log.d("UPDATE_MAP_LIST_WRAPPERS", "Processing villager: ${villager.name}, with listWrapperIds: ${villager.listWrapperIds.toString()}")
                 for (listWrapper in listWrapperList) {
-                    Log.d("UPDATE_MAP_LIST_WRAPPERS", "Checking listWrapper: $listWrapper")
                     if (listWrapper.keyId in listWrapperIds) {
                         Log.d("UPDATE_MAP_LIST_WRAPPERS", "Adding villager to list with keyId: ${listWrapper.keyId}, name: ${listWrapper.listName}")
                         val villagerListForKeyId = villagerMap.getOrPut(listWrapper.keyId) { mutableListOf() }

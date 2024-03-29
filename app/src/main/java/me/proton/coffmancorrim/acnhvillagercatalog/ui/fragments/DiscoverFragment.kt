@@ -7,19 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import me.proton.coffmancorrim.acnhvillagercatalog.R
+import me.proton.coffmancorrim.acnhvillagercatalog.databinding.FragmentDiscoverBinding
 import me.proton.coffmancorrim.acnhvillagercatalog.ui.common.VillagersListFragment
 import me.proton.coffmancorrim.acnhvillagercatalog.util.FragmentUtil
 import me.proton.coffmancorrim.acnhvillagercatalog.viewmodels.MainViewModel
 
 class DiscoverFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
+    private lateinit var binding: FragmentDiscoverBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
-        return inflater.inflate(R.layout.fragment_discover, container, false)
+    ): View {
+        binding = FragmentDiscoverBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
